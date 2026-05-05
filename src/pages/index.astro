@@ -1,0 +1,271 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import FormattedDate from '../components/FormattedDate.astro';
+import Header from '../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../consts';
+import placeholderImage from '../assets/blog-placeholder-1.jpg';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={SITE_TITLE} description={SITE_DESCRIPTION} />
+	</head>
+	<body>
+		<Header />
+		<main>
+			<!-- Hero Section -->
+			<section class="hero">
+				<div class="hero-glow"></div>
+				<div class="hero-badge">AI · Electronics · Hardware</div>
+				<h1 class="hero-title">
+					Design Hardware<br />
+					<span class="gradient-text">with AI</span>
+				</h1>
+				<p class="hero-subtitle">
+					Exploring how artificial intelligence transforms electronics development — from
+					streamlining KiCad workflows to enabling team-scale hardware design automation.
+				</p>
+				<div class="hero-actions">
+					<a href="/blog" class="btn btn-primary">Read the Blog</a>
+					<a href="/about" class="btn btn-secondary">About Me</a>
+				</div>
+			</section>
+
+			<!-- Latest Posts -->
+			<section class="featured-section">
+				<h2 class="section-title">Latest Posts</h2>
+				<div class="posts-grid">
+					{
+						posts.slice(0, 4).map((post) => (
+							<a href={`/blog/${post.id}/`} class="post-card">
+								<div class="post-card-image">
+									{post.data.heroImage ? (
+										<Image width={640} height={360} src={post.data.heroImage} alt="" />
+									) : (
+										<Image width={640} height={360} src={placeholderImage} alt="" />
+									)}
+								</div>
+								<div class="post-card-body">
+									<h3 class="post-card-title">{post.data.title}</h3>
+									<p class="post-card-desc">{post.data.description}</p>
+									<div class="post-card-meta">
+										<FormattedDate date={post.data.pubDate} />
+									</div>
+								</div>
+							</a>
+						))
+					}
+				</div>
+				<div class="section-footer">
+					<a href="/blog" class="btn btn-text">View All Posts →</a>
+				</div>
+			</section>
+		</main>
+		<Footer />
+	</body>
+</html>
+
+<style>
+	/* Hero */
+	.hero {
+		position: relative;
+		text-align: center;
+		padding: 6em 1em 4em;
+		overflow: hidden;
+	}
+	.hero-glow {
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		width: 600px;
+		height: 600px;
+		transform: translate(-50%, -55%);
+		background: radial-gradient(circle, rgba(0, 212, 255, 0.06) 0%, transparent 70%);
+		pointer-events: none;
+	}
+	.hero-badge {
+		display: inline-block;
+		padding: 0.35em 1em;
+		border: 1px solid var(--border-accent);
+		border-radius: 100px;
+		font-size: 0.8em;
+		color: var(--accent);
+		background: rgba(0, 212, 255, 0.05);
+		margin-bottom: 1.5em;
+		letter-spacing: 0.05em;
+		text-transform: uppercase;
+		font-weight: 500;
+	}
+	.hero-title {
+		font-size: 4em;
+		font-weight: 800;
+		line-height: 1.1;
+		margin-bottom: 0.5em;
+		color: var(--text-primary);
+		letter-spacing: -0.03em;
+	}
+	.gradient-text {
+		background: var(--gradient-1);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+	.hero-subtitle {
+		max-width: 600px;
+		margin: 0 auto 2em;
+		font-size: 1.1em;
+		line-height: 1.7;
+		color: var(--text-secondary);
+	}
+	.hero-actions {
+		display: flex;
+		gap: 1em;
+		justify-content: center;
+		flex-wrap: wrap;
+	}
+
+	/* Buttons */
+	.btn {
+		display: inline-flex;
+		align-items: center;
+		gap: 0.5em;
+		padding: 0.75em 1.75em;
+		font-size: 0.95em;
+		font-weight: 600;
+		border-radius: var(--radius-sm);
+		transition: all 0.25s ease;
+		text-decoration: none;
+		font-family: var(--font-sans);
+		cursor: pointer;
+	}
+	.btn-primary {
+		background: var(--gradient-1);
+		color: #fff;
+		border: none;
+	}
+	.btn-primary:hover {
+		opacity: 0.9;
+		transform: translateY(-1px);
+		box-shadow: 0 8px 24px rgba(0, 212, 255, 0.2);
+		color: #fff;
+	}
+	.btn-secondary {
+		background: transparent;
+		color: var(--text-primary);
+		border: 1px solid var(--border);
+	}
+	.btn-secondary:hover {
+		border-color: var(--text-muted);
+		background: rgba(255, 255, 255, 0.03);
+		color: var(--text-primary);
+		transform: translateY(-1px);
+	}
+	.btn-text {
+		background: transparent;
+		color: var(--accent);
+		padding: 0.5em 0;
+		border: none;
+		font-size: 0.95em;
+	}
+	.btn-text:hover {
+		color: #66e5ff;
+		gap: 0.75em;
+	}
+
+	/* Section */
+	.featured-section {
+		padding: 3em 0;
+	}
+	.section-title {
+		font-size: 1.5em;
+		font-weight: 600;
+		margin-bottom: 1.5em;
+		color: var(--text-primary);
+	}
+	.section-footer {
+		text-align: center;
+		margin-top: 2em;
+	}
+
+	/* Post Cards */
+	.posts-grid {
+		display: grid;
+		grid-template-columns: repeat(2, 1fr);
+		gap: 1.5em;
+	}
+	.post-card {
+		display: flex;
+		flex-direction: column;
+		background: var(--bg-card);
+		border: 1px solid var(--border);
+		border-radius: var(--radius);
+		overflow: hidden;
+		transition: all 0.3s ease;
+		text-decoration: none;
+	}
+	.post-card:hover {
+		border-color: rgba(0, 212, 255, 0.15);
+		background: var(--bg-card-hover);
+		transform: translateY(-2px);
+		box-shadow: var(--shadow-glow);
+	}
+	.post-card-image {
+		width: 100%;
+		aspect-ratio: 16 / 9;
+		overflow: hidden;
+	}
+	.post-card-image img {
+		width: 100%;
+		height: 100%;
+		object-fit: cover;
+		transition: transform 0.4s ease;
+		border-radius: 0;
+	}
+	.post-card:hover .post-card-image img {
+		transform: scale(1.03);
+	}
+	.post-card-body {
+		padding: 1.25em;
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	}
+	.post-card-title {
+		font-size: 1.1em;
+		font-weight: 600;
+		margin: 0 0 0.5em;
+		line-height: 1.3;
+		color: var(--text-primary);
+	}
+	.post-card-desc {
+		font-size: 0.9em;
+		color: var(--text-secondary);
+		margin: 0 0 0.75em;
+		line-height: 1.5;
+		flex: 1;
+	}
+	.post-card-meta {
+		font-size: 0.8em;
+		color: var(--text-muted);
+	}
+
+	@media (max-width: 720px) {
+		.hero-title {
+			font-size: 2.5em;
+		}
+		.hero {
+			padding: 4em 0.5em 3em;
+		}
+		.posts-grid {
+			grid-template-columns: 1fr;
+		}
+	}
+</style>

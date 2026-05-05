@@ -1,0 +1,107 @@
+---
+const today = new Date();
+---
+
+<footer>
+	<div class="footer-content">
+		<div class="footer-brand">
+			<span class="logo-icon">◈</span>
+			<span class="brand-name">CircuitHub</span>
+			<p class="brand-tagline">AI-assisted electronics hardware development.</p>
+		</div>
+		<div class="footer-links">
+			<a href="/">Home</a>
+			<a href="/blog">Blog</a>
+			<a href="/about">About</a>
+		</div>
+		<div class="footer-social">
+			<a href="https://github.com" target="_blank" rel="noopener noreferrer" title="GitHub">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M12 0C5.37 0 0 5.37 0 12c0 5.31 3.435 9.795 8.205 11.385.6.105.825-.255.825-.57 0-.285-.015-1.23-.015-2.235-3.015.555-3.795-.735-4.035-1.41-.135-.345-.72-1.41-1.23-1.695-.42-.225-1.02-.78-.015-.795.945-.015 1.62.87 1.845 1.23 1.08 1.815 2.805 1.305 3.495.99.105-.78.42-1.305.765-1.605-2.67-.3-5.46-1.335-5.46-5.925 0-1.305.465-2.385 1.23-3.225-.12-.3-.54-1.53.12-3.18 0 0 1.005-.315 3.3 1.23.96-.27 1.98-.405 3-.405s2.04.135 3 .405c2.295-1.56 3.3-1.23 3.3-1.23.66 1.65.24 2.88.12 3.18.765.84 1.23 1.905 1.23 3.225 0 4.605-2.805 5.625-5.475 5.925.435.375.81 1.095.81 2.22 0 1.605-.015 2.895-.015 3.3 0 .315.225.69.825.57A12.02 12.02 0 0 0 24 12c0-6.63-5.37-12-12-12z"/></svg>
+			</a>
+			<a href="https://twitter.com" target="_blank" rel="noopener noreferrer" title="X / Twitter">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>
+			</a>
+			<a href="/rss.xml" target="_blank" rel="noopener noreferrer" title="RSS Feed">
+				<svg viewBox="0 0 24 24" width="20" height="20" fill="currentColor"><path d="M19.199 24C19.199 13.467 10.533 4.8 0 4.8V0c13.165 0 24 10.835 24 24h-4.801zM3.291 17.415a3.291 3.291 0 0 1 3.291 3.295A3.293 3.293 0 0 1 3.283 24a3.291 3.291 0 0 1 0-6.585zM0 10.8v-3.6c7.289 0 13.2 5.911 13.2 13.2h-3.6c0-5.301-4.299-9.6-9.6-9.6z"/></svg>
+			</a>
+		</div>
+	</div>
+	<div class="footer-bottom">
+		&copy; {today.getFullYear()} CircuitHub. All rights reserved.
+	</div>
+</footer>
+
+<style>
+	footer {
+		border-top: 1px solid var(--border);
+		background: var(--bg-secondary);
+		padding: 3em 1.5em 2em;
+	}
+	.footer-content {
+		max-width: 860px;
+		margin: 0 auto;
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: space-between;
+		align-items: flex-start;
+		gap: 2em;
+	}
+	.footer-brand {
+		flex: 1;
+		min-width: 200px;
+	}
+	.logo-icon {
+		font-size: 1.5em;
+		background: var(--gradient-1);
+		-webkit-background-clip: text;
+		-webkit-text-fill-color: transparent;
+		background-clip: text;
+	}
+	.brand-name {
+		font-weight: 700;
+		font-size: 1.1em;
+		color: var(--text-primary);
+		margin-left: 0.4em;
+	}
+	.brand-tagline {
+		margin: 0.5em 0 0 0;
+		font-size: 0.9em;
+		color: var(--text-muted);
+	}
+	.footer-links {
+		display: flex;
+		flex-direction: column;
+		gap: 0.5em;
+	}
+	.footer-links a {
+		color: var(--text-secondary);
+		font-size: 0.9em;
+		transition: color 0.2s;
+	}
+	.footer-links a:hover {
+		color: var(--accent);
+	}
+	.footer-social {
+		display: flex;
+		gap: 1em;
+		align-items: center;
+	}
+	.footer-social a {
+		color: var(--text-muted);
+		transition: color 0.2s;
+		display: flex;
+		align-items: center;
+	}
+	.footer-social a:hover {
+		color: var(--accent);
+	}
+	.footer-bottom {
+		max-width: 860px;
+		margin: 2em auto 0;
+		padding-top: 1.5em;
+		border-top: 1px solid var(--border);
+		text-align: center;
+		font-size: 0.85em;
+		color: var(--text-muted);
+	}
+</style>

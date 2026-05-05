@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets';
+import { getCollection } from 'astro:content';
+import BaseHead from '../../components/BaseHead.astro';
+import Footer from '../../components/Footer.astro';
+import FormattedDate from '../../components/FormattedDate.astro';
+import Header from '../../components/Header.astro';
+import { SITE_DESCRIPTION, SITE_TITLE } from '../../consts';
+import placeholderImage from '../../assets/blog-placeholder-1.jpg';
+
+const posts = (await getCollection('blog')).sort(
+	(a, b) => b.data.pubDate.valueOf() - a.data.pubDate.valueOf(),
+);
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`Blog — ${SITE_TITLE}`} description={SITE_DESCRIPTION} />
+		<style>
+			.blog-header {
+				padding: 3em 0 2em;
+			}
+			.blog-header h1 {
+				font-size: 2.8em;
+				font-weight: 800;
+				margin: 0 0 0.3em;
+			}
+			.blog-header p {
+				font-size: 1.1em;
+				color: var(--text-secondary);
+				margin: 0;
+			}
+			.posts-list {
+				display: flex;
+				flex-direction: column;
+				gap: 1.25em;
+				padding: 1em 0 3em;
+			}
+
+			/* Post item as horizontal card */
+			.post-item {
+				display: flex;
+				gap: 1.5em;
+				background: var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				overflow: hidden;
+				transition: all 0.3s ease;
+				text-decoration: none;
+				padding: 0;
+			}
+			.post-item:hover {
+				border-color: rgba(0, 212, 255, 0.15);
+				background: var(--bg-card-hover);
+				transform: translateY(-1px);
+				box-shadow: var(--shadow-glow);
+			}
+			.post-item-image {
+				width: 220px;
+				min-height: 140px;
+				flex-shrink: 0;
+				overflow: hidden;
+			}
+			.post-item-image img {
+				width: 100%;
+				height: 100%;
+				object-fit: cover;
+				transition: transform 0.4s ease;
+				border-radius: 0;
+				display: block;
+			}
+			.post-item:hover .post-item-image img {
+				transform: scale(1.05);
+			}
+			.post-item-body {
+				padding: 1.25em 1.25em 1.25em 0;
+				flex: 1;
+				display: flex;
+				flex-direction: column;
+			}
+			.post-item-title {
+				font-size: 1.15em;
+				font-weight: 600;
+				margin: 0 0 0.4em;
+				line-height: 1.3;
+				color: var(--text-primary);
+			}
+			.post-item-desc {
+				font-size: 0.9em;
+				color: var(--text-secondary);
+				margin: 0 0 0.6em;
+				line-height: 1.5;
+				flex: 1;
+			}
+			.post-item-meta {
+				font-size: 0.8em;
+				color: var(--text-muted);
+			}
+
+			@media (max-width: 720px) {
+				.blog-header h1 {
+					font-size: 2em;
+				}
+				.post-item {
+					flex-direction: column;
+					gap: 0;
+				}
+				.post-item-image {
+					width: 100%;
+					height: 180px;
+				}
+				.post-item-body {
+					padding: 1em;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<div class="blog-header">
+				<h1>Blog</h1>
+				<p>Thoughts on AI-assisted hardware design, KiCad automation, and electronics workflows.</p>
+			</div>
+
+			<div class="posts-list">
+				{
+					posts.map((post) => (
+						<a href={`/blog/${post.id}/`} class="post-item">
+							<div class="post-item-image">
+								{post.data.heroImage ? (
+									<Image width={440} height={280} src={post.data.heroImage} alt="" />
+								) : (
+									<Image width={440} height={280} src={placeholderImage} alt="" />
+								)}
+							</div>
+							<div class="post-item-body">
+								<h2 class="post-item-title">{post.data.title}</h2>
+								<p class="post-item-desc">{post.data.description}</p>
+								<div class="post-item-meta">
+									<FormattedDate date={post.data.pubDate} />
+								</div>
+							</div>
+						</a>
+					))
+				}
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>

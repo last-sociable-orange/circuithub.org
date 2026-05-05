@@ -1,0 +1,155 @@
+---
+import BaseHead from '../components/BaseHead.astro';
+import Footer from '../components/Footer.astro';
+import Header from '../components/Header.astro';
+import { SITE_TITLE } from '../consts';
+---
+
+<!doctype html>
+<html lang="en">
+	<head>
+		<BaseHead title={`About — ${SITE_TITLE}`} description="About CircuitHub — AI-assisted electronics hardware development." />
+		<style>
+			.about-hero {
+				text-align: center;
+				padding: 4em 0 3em;
+			}
+			.about-hero h1 {
+				font-size: 2.8em;
+				font-weight: 800;
+				margin-bottom: 0.5em;
+			}
+			.about-hero .accent {
+				background: var(--gradient-1);
+				-webkit-background-clip: text;
+				-webkit-text-fill-color: transparent;
+				background-clip: text;
+			}
+			.about-hero p {
+				max-width: 560px;
+				margin: 0 auto;
+				font-size: 1.1em;
+				color: var(--text-secondary);
+			}
+
+			.about-content {
+				max-width: 680px;
+				margin: 0 auto;
+			}
+			.about-content h2 {
+				font-size: 1.4em;
+				font-weight: 600;
+				margin: 2em 0 0.75em;
+				color: var(--text-primary);
+			}
+			.about-content p {
+				margin-bottom: 1.2em;
+				color: var(--text-secondary);
+				line-height: 1.7;
+			}
+
+			.topics-grid {
+				display: grid;
+				grid-template-columns: repeat(2, 1fr);
+				gap: 1em;
+				margin: 1.5em 0;
+			}
+			.topic-card {
+				background: var(--bg-card);
+				border: 1px solid var(--border);
+				border-radius: var(--radius);
+				padding: 1.25em;
+				transition: all 0.3s ease;
+			}
+			.topic-card:hover {
+				border-color: rgba(0, 212, 255, 0.15);
+				background: var(--bg-card-hover);
+			}
+			.topic-card .icon {
+				font-size: 1.5em;
+				margin-bottom: 0.5em;
+			}
+			.topic-card h3 {
+				font-size: 1em;
+				font-weight: 600;
+				margin: 0 0 0.4em;
+				color: var(--text-primary);
+			}
+			.topic-card p {
+				font-size: 0.9em;
+				margin: 0;
+				color: var(--text-muted);
+			}
+
+			@media (max-width: 720px) {
+				.about-hero h1 {
+					font-size: 2em;
+				}
+				.topics-grid {
+					grid-template-columns: 1fr;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<Header />
+		<main>
+			<section class="about-hero">
+				<h1>
+					About <span class="accent">CircuitHub</span>
+				</h1>
+				<p>
+					Exploring the intersection of artificial intelligence and electronics hardware
+					engineering — one KiCad project at a time.
+				</p>
+			</section>
+
+			<div class="about-content">
+				<p>
+					CircuitHub is a blog dedicated to pushing the boundaries of electronics hardware
+					development using AI. I believe that artificial intelligence — from large language
+					models to specialized ML tools — can fundamentally change how we design, simulate,
+					and manufacture electronic circuits.
+				</p>
+
+				<h2>What I Write About</h2>
+
+				<div class="topics-grid">
+					<div class="topic-card">
+						<div class="icon">🧠</div>
+						<h3>AI-Assisted Design</h3>
+						<p>Using LLMs and AI agents to accelerate schematic capture, PCB layout, and design reviews.</p>
+					</div>
+					<div class="topic-card">
+						<div class="icon">⚡</div>
+						<h3>KiCad + AI</h3>
+						<p>Extending KiCad capabilities for larger teams — automation, scripting, and intelligent routing.</p>
+					</div>
+					<div class="topic-card">
+						<div class="icon">🔄</div>
+						<h3>Workflow Automation</h3>
+						<p>Streamlining the hardware development pipeline from spec to BOM to manufacturing.</p>
+					</div>
+					<div class="topic-card">
+						<div class="icon">🔬</div>
+						<h3>Team-Scale Hardware</h3>
+						<p>Best practices for collaborative hardware design, version control, and CI/CD for electronics.</p>
+					</div>
+				</div>
+
+				<h2>Why This Blog?</h2>
+				<p>
+					Hardware development has lagged behind software in tooling and automation. With the
+					rise of capable AI models, we now have an opportunity to close that gap. This blog
+					documents experiments, workflows, and tools that make electronics engineering faster,
+					smarter, and more collaborative.
+				</p>
+				<p>
+					Whether you're a solo hardware hacker or part of a growing team, if you're curious
+					about how AI can supercharge your electronics workflow — you're in the right place.
+				</p>
+			</div>
+		</main>
+		<Footer />
+	</body>
+</html>
