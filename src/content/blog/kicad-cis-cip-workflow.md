@@ -5,34 +5,23 @@ pubDate: 'Apr 28 2026'
 heroImage: '../../assets/blog-placeholder-5.jpg'
 ---
 
-If you've ever designed a PCB with a team using Orcad, you've probably used **CIS** (Component Information System) and **CIP** (Component Information Portal). These tools let you manage a centralized component database — storing manufacturer part numbers, distributor SKUs, parametric data, datasheet URLs, and links to KiCad symbols and footprints — all in one place.
+If you've ever designed a PCB with a team using OrCAD, you've likely used **CIS** (Component Information System) and **CIP** (Component Information Portal). These tools integrate a centralized component database that stores manufacturer part numbers, distributor SKUs, parametric data, and datasheet URLs in one place. **CIS** is critical because it eliminates duplicate data entry and prevents the use of obsolete or unauthorized parts during schematic design. **CIP** is equally essential—it streamlines part request and approval workflows, ensuring that only verified components enter the database. Together, they reduce BOM errors, shorten design cycles, and enforce design consistency across teams, making them indispensable for professional PCB development.
 
-KiCad has had a database library feature since version 7, but it really came into its own in **KiCad 9.0** with improved SQLite support. The problem? There's no built-in GUI tool for populating and managing that database.
+KiCad has included a database library feature since version 7, allowing designers to link symbols and footprints to external data sources like SQLite, MySQL, or PostgreSQL via ODBC connections. However, unlike OrCAD CIS/CIP, KiCad's implementation remains largely manual and lacks a built-in GUI for database management. Users must manually input every component's parameters (part numbers, values, tolerances, datasheet links, etc.) directly into the database using external tools — there is no form-based entry or validation within KiCad itself. Creating a usable component database currently requires manual SQL scripting or third-party database clients (such as SQLiteStudio) — a steep barrier for engineers without database experience.
 
 Until now.
 
 ## The Tool: `kicad-lib-gen`
 
-I built a command-line tool called [`kicad-lib-gen`](https://github.com/your-org/kicad_lib_gen) that brings the CIS/CIP workflow to KiCad. It connects to the **Digikey API**, fetches real-time product data, and stores it directly into a SQLite database that KiCad's symbol and footprint choosers can read natively.
+I built a command-line tool called [`kicad-lib-gen`](https://github.com/last-sociable-orange/kicad_lib_gen) that brings the CIS/CIP workflow to KiCad. It connects to the **Digikey API**, fetches real-time product data, and stores it directly into a SQLite database that KiCad's symbol and footprint choosers can read natively.
 
 Here's what it does:
 
 - **Search Digikey** by manufacturer part number and pull down descriptions, parameters, pricing, datasheet URLs, and availability
 - **Store everything** into a SQLite database with the exact schema KiCad expects
 - **Link components** to KiCad symbols and footprints (with tab-completion for existing entries)
-- **Batch import** hundreds of parts from a CSV file for team-scale setup
+- **Batch import** hundreds of parts from a CSV file
 - **Auto-refresh** Digikey OAuth tokens so you don't have to babysit authentication
-
-## Why This Matters
-
-Component data management is one of the biggest pain points in hardware design, especially for teams. Without a centralized system:
-
-- Engineers waste time hunting down datasheets
-- BOMs end up with mismatched distributor SKUs
-- The same component gets different symbols in different projects
-- There's no single source of truth for part status, pricing, or lifecycle
-
-Orcad solves this with CIS/CIP. KiCad solves the PCB design part beautifully, but the component data layer has been DIY. This tool closes that gap.
 
 ## How It Works
 
@@ -78,18 +67,18 @@ Total 5 products found:
 Choose one product, 0 to exit: 1
 ```
 
-After selecting the part, it prompts you for the KiCad symbol and footprint, with **auto-completion** of existing libraries in your database:
+After selecting the part, it prompts you for the KiCad symbol and footprint, with **auto-completion** of existing libraries in your database. These names will link to the component `.kicad_sym` and `.kicad_mod` files in your local project folder.
 
 ```
-Enter Kicad symbol library name: Standard:LM324
-Enter Kicad footprint library name: Standard:LM324_DIP-14
+Enter Kicad symbol library name: Symbol:IC_LM324N
+Enter Kicad footprint library name: Footprint:IC_LM324N
 ```
 
 A neat trick: you can use `?` as a placeholder for the product number:
 
 ```
-Enter Kicad symbol library name: ?      -> becomes LM324N
-Enter Kicad footprint library name: ?   -> becomes LM324N
+Enter Kicad symbol library name: Symbol:IC_?      -> becomes Symbol:IC_LM324N
+Enter Kicad footprint library name: Footprint:IC_?   -> becomes Footprint:IC_LM324N
 ```
 
 This is a huge time-saver when you're importing dozens of parts.
@@ -106,12 +95,12 @@ Your CSV file looks like this:
 
 ```csv
 manufacturer_product_number,kicad_symbol_library,kicad_footprint_library
-LM324N,Standard:LM324,Standard:LM324_SOIC-14
-ATMega328P,Standard:ATMega328P,Standard:ATMega328P_DIP-28
-STM32F103C8T6,Standard:STM32F103C8T6,Standard:STM32F103_LQFP48
+LM324N,Symbol:IC_LM324N,Footprint:IC_LM324N
+ATMega328P,Symbol:IC_ATMega328PB-MU,Footprint:IC_ATMega328PB-MU
+STM32F103C8T6,Symbol:IC_STM32F103C8T6,Footprint:IC_STM32F103C8T6
 ```
 
-The tool iterates each row, searches Digikey for an exact match, and auto-inserts the record with the specified symbol and footprint. It's strict — if a search returns zero or multiple results, it fails fast rather than silently picking the wrong part.
+The tool iterates each row, searches Digikey for an exact match, and auto-inserts the record with the specified symbol and footprint. It's strict — if a search returns zero or multiple results, it fails fast rather than silently picking the wrong part. Log file is provided so that you are fully aware which components are inserted and which are dropped with reasons. 
 
 ### 5. Symbol and Footprint Organization
 
@@ -122,48 +111,46 @@ Library/
 ├── components.db                     # SQLite database
 ├── components_db.kicad_dbl           # KiCad ODBC config
 ├── Symbol/
-│   ├── IC_LM324N.kicad_sym           # Per-part symbols
-│   └── IC_ATMega328P.kicad_sym
+│   ├── Symbol           			  # Per-part symbols
+│   │	├── IC_LM324N.kicad_sym       
+│   │	└── IC_ATMega328PB-MU.kicad_sym
+│   └── Standard           			  # Standard symbols
+│   	└── Standard.kicad_sym
 ├── Footprint/
-│   └── Footprint.pretty/
-│       ├── LM324N_SOIC-14.pretty     # Per-part footprints
-│       └── ATMega328P_DIP-28.pretty
-├── Step/                              # 3D models
-│   ├── LM324N.step
-│   └── ATMega328P.step
-└── Standard/                          # Shared generic libs
-    ├── Standard.kicad_sym             # Resistors, caps, power symbols
-    └── Standard.pretty/
-        ├── R_0402.pretty
-        └── SOT23.pretty
+│   ├── Footprint.pretty/
+│   │   ├── IC_LM324N.pretty     	  # Per-part footprints
+│   │   └── IC_ATMega328PB-MU.pretty
+│   └── Standard.pretty/			  # Standard footprints
+│       ├── R_0402.pretty
+│       └── SOT23.pretty
+└── Step/                              # 3D models
+    ├── IC_LM324N.stp
+    └── IC_ATMega328PB-MU.stp
 ```
 
-The key insight: **generic components** (resistors, capacitors, standard logic) use shared symbols in `Standard.kicad_sym`, while **specific ICs** each get their own symbol file. This gives you the best of both worlds — reuse for common parts, isolation for complex ones.
+The key insight: **generic components** (resistors, capacitors, standard logic) use shared symbols in `Standard.kicad_sym`, while **specific ICs, passives, connectors, etc.** each get their own file. This gives you the best of both worlds — reuse for common parts, isolation for complex ones.
 
 ## Connecting It to KiCad
 
-Once your database is populated, you configure KiCad to use it:
+Once your database is populated, you configure KiCad to use it. Make sure the way how you setup your Kicad libraries matches what you have entered in your database  `KicadSymbolLibrary` and `KicadFootprintLibrary` fields using the command line prompt.
 
-1. Place `components_db.kicad_dbl` in your project root
-2. In KiCad's Symbol Chooser, you'll see a new library tab for your database
-3. Browse components by category, search by keyword, and place them on your schematic
-4. The footprint is automatically associated — KiCad picks it up from the database record
+1. Install SQLite database driver, setup DSN, etc.
+2. Place `components_db.kicad_dbl` in your project `Library` folder
+3. In KiCad, open the **Manage Symbol Libraries** menu and add your database library file (`.kicad_dbl`) to `Project Specific Libraries`. 
+4. Link to your per-part symbols. You have two options to add files to `Project Specific Libraries`:
+   + Add each individual files : If you add per-part symbols (i.e.: IC_LM324N.kicad_sym that contains only one symbol named IC_LM324N) in your `Project Specific Libraries`, you have to input `IC_LM324N:IC_LM324N` when you are prompted to enter the Kicad symbol library name. Basically with this scheme, the symbol library name should be `<symbol_file_name>:<symbol_name>` .
+   + Add entire folder (Kicad 10 new feature): You can add the folder as opposed to symbol files to your `Project Specific Libraries`. With this scheme, the symbol library name should be  `<symbol_folder_name>:<symbol_file_name>`  
+5. Add your `Standard.kicad_sym`  as regular kicad symbol
+6. Then open the **Manage Footprint Libraries** menu to ensure the footprint library paths referenced in your database are accessible.
+7. In KiCad's Symbol Chooser, you'll see components from your database
+8. Browse components by category, search by keyword, and place them on your schematic
+9. The footprint is automatically associated — KiCad picks it up from the database record
 
 This mirrors the Orcad CIS experience: you browse a database-driven library, place a symbol, and the footprint and metadata follow.
 
-## What This Unlocks for Teams
-
-With a centralized, database-backed component library, teams can:
-
-- **Enforce part selection standards** — only approved parts make it into the database
-- **Eliminate datasheet hunting** — one click from the symbol chooser opens the datasheet
-- **Automate BOM generation** — export from the database with real distributor SKUs and pricing
-- **Track part lifecycles** — flag obsolete components before they cause a prototype spin
-- **Git-version the library** — the database, symbols, and footprints all live in version control
-
 ## Getting Started
 
-The tool is live on [GitHub](https://github.com/your-org/kicad_lib_gen). Here's the quick start:
+The tool is live on [GitHub](https://github.com/last-sociable-orange/kicad_lib_gen). Here's the quick start:
 
 ```bash
 # Install dependencies
@@ -179,19 +166,10 @@ uv run kicad_cip.py -k "LM324N"
 uv run kicad_cip.py -b bom_parts.csv
 ```
 
-You'll need Python 3.13+ and a free Digikey developer account, but that's it — no server, no cloud dependency, no vendor lock-in. The database is just a SQLite file on your disk.
+You'll need a free Digikey developer account, but that's it — no server, no cloud dependency, no vendor lock-in. The database is just a SQLite file on your disk.
 
-## What's Next
-
-This is an early but functional release. Future plans include:
-
-- **Multi-distributor support** — Mouser, LCSC, Farnell APIs
-- **Symbol auto-generation** — programmatic symbol creation from package data
-- **KiCad plugin GUI** — browse and manage the database from within KiCad
-- **Lifecycle alerts** — CI checks that flag NRND or obsolete parts before tape-out
-
-If you're using KiCad in a team setting and missing the CIS/CIP workflow from Orcad, give this a try. The gap between open-source EDA and commercial tools is shrinking — one database record at a time.
+If you're using KiCad in a team setting and missing the CIS/CIP workflow from Orcad, give this a try. 
 
 ---
 
-*Have questions or ideas? Drop me a note or open an issue on GitHub. This is very much a community-driven project.*
+*Have questions or ideas? Drop me a note or open an issue on GitHub.*
