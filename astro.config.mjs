@@ -6,7 +6,6 @@ import { defineConfig } from 'astro/config';
 
 // https://astro.build/config
 export default defineConfig({
-	site: 'https://last-sociable-orange.github.io',
+	site: 'https://circuithub.org',
 	integrations: [mdx(), sitemap()],
-	base: '/circuithub.org',
 });
