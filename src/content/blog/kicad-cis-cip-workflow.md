@@ -5,15 +5,17 @@ pubDate: 'Apr 28 2026'
 heroImage: '../../assets/blog-placeholder-5.jpg'
 ---
 
+## Why I wrote a tool for Kicad Database Library
+
 If you've ever designed a PCB with a team using OrCAD, you've likely used **CIS** (Component Information System) and **CIP** (Component Information Portal). These tools integrate a centralized component database that stores manufacturer part numbers, distributor SKUs, parametric data, and datasheet URLs in one place. **CIS** is critical because it eliminates duplicate data entry and prevents the use of obsolete or unauthorized parts during schematic design. **CIP** is equally essential—it streamlines part request and approval workflows, ensuring that only verified components enter the database. Together, they reduce BOM errors, shorten design cycles, and enforce design consistency across teams, making them indispensable for professional PCB development.
 
 KiCad has included a database library feature since version 7, allowing designers to link symbols and footprints to external data sources like SQLite, MySQL, or PostgreSQL via ODBC connections. However, unlike OrCAD CIS/CIP, KiCad's implementation remains largely manual and lacks a built-in GUI for database management. Users must manually input every component's parameters (part numbers, values, tolerances, datasheet links, etc.) directly into the database using external tools — there is no form-based entry or validation within KiCad itself. Creating a usable component database currently requires manual SQL scripting or third-party database clients (such as SQLiteStudio) — a steep barrier for engineers without database experience.
 
-Until now.
+So I wrote a python script to bring CIS/CIP workflow to Kicad. 
 
 ## The Tool: `kicad-lib-gen`
 
-I built a command-line tool called [`kicad-lib-gen`](https://github.com/last-sociable-orange/kicad_lib_gen) that brings the CIS/CIP workflow to KiCad. It connects to the **Digikey API**, fetches real-time product data, and stores it directly into a SQLite database that KiCad's symbol and footprint choosers can read natively.
+This command-line python script [`kicad-lib-gen`](https://github.com/last-sociable-orange/kicad_lib_gen) brings the CIS/CIP workflow to KiCad. It connects to the **Digikey API**, fetches real-time product data, and stores it directly into a SQLite database that KiCad's symbol and footprint choosers can read natively.
 
 Here's what it does:
 
@@ -169,6 +171,10 @@ uv run kicad_cip.py -b bom_parts.csv
 You'll need a free Digikey developer account, but that's it — no server, no cloud dependency, no vendor lock-in. The database is just a SQLite file on your disk.
 
 If you're using KiCad in a team setting and missing the CIS/CIP workflow from Orcad, give this a try. 
+
+## Disclaimer
+
+I am not a software developer. This script is intended for DIYers and hobbyist use only. It is provided as-is, with no guarantees of correctness, data integrity, or compatibility with future KiCad or Digikey API changes. You assume full responsibility for any issues — including corrupted databases, incorrect BOMs, or fried PCBs. Always verify part data against official manufacturer sources before ordering components.
 
 ---
 
