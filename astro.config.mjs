@@ -8,4 +8,5 @@ import { defineConfig } from 'astro/config';
 export default defineConfig({
 	site: 'https://www.circuithub.org',
 	integrations: [mdx(), sitemap()],
+	base: '/circuithub.org',
 });
