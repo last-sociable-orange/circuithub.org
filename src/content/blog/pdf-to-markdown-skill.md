@@ -71,7 +71,7 @@ This is where the skill's image output becomes important. Since the skill extrac
 
 This separation of concerns is deliberate: `pdf_to_markdown.py` handles the deterministic PDF parsing, while the equation OCR is deferred to an LLM that can interpret the visual content. LLM doesn't read and translate the entire pdf as OCR anymore. It just handles a tiny friction of the pdf and it is much faster. This approach takes the best of two sides with great time and cost saver.
 
-In practice, this workflow is handled by a [doc agent](https://github.com/last-sociable-orange/pi-extensions) that orchestrates the full pipeline — extract, clean up image paths, OCR equations, and insert LaTeX — turning a raw datasheet PDF into a Markdown file with proper mathematical notation.
+In practice, this workflow is handled by a [doc agent](https://github.com/last-sociable-orange/CircuitPilot) that orchestrates the full pipeline — extract, clean up image paths, OCR equations, and insert LaTeX — turning a raw datasheet PDF into a Markdown file with proper mathematical notation.
 
 ## Usage in Context
 
