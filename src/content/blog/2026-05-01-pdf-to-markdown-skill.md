@@ -2,7 +2,7 @@
 title: 'Getting AI to Read Datasheets — A PDF-to-Markdown Pipeline for Engineering Documents'
 description: "Why OCR is the wrong approach for feeding PDF datasheets and user manuals into AI coding agents, and how a PyMuPDF-based extraction pipeline delivers clean, structured Markdown output instead."
 slug: 'pdf-to-markdown-skill'
-pubDate: 'May 07 2026'
+pubDate: 'May 01 2026'
 heroImage: '../../assets/blog-placeholder-4.jpg'
 ---
 
