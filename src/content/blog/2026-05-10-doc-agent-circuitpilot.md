@@ -9,7 +9,7 @@ series: 'pi-extensions-for-hardware-design'
 
 ## Why I Convert Datasheets to Markdown
 
-When I'm deep in a design and need to check a pin mapping, a register field, or absolute maximum ratings, I open a PDF and Ctrl-F my way to the answer. It works. But I do this dozens of times per design, and the PDF is often 60 pages. User manuals for processors are thousands of pages — grepping them is slow and reading them linearly is impossible.
+When I'm deep in a design and need to check a pin mapping, a register field, or absolute maximum ratings, I open a PDF and Ctrl-F my way to the answer. It works. But I do this dozens of times per design, and some PDFs, like user manuals for processors, are thousands of pages — grepping them is slow and reading them linearly is impossible.
 
 The real reason I convert datasheets, though, is so an LLM can read them. If the designer agent (Part 4) can search a Markdown file for "feedback voltage" or "inductor selection guidelines" and pull the exact section it needs, it can run design calculations against real datasheet numbers. If the datasheet is still a PDF, the LLM gets garbled text — tables break, multi-column layouts confuse the tokenizer, images are invisible.
 
@@ -17,7 +17,19 @@ So the first step in any hardware design with AI assistance is: **convert every 
 
 ## How I Use It
 
-The doc agent is a sub-agent in CircuitPilot. It has one job: take PDFs from `WIP/` and produce organized, searchable Markdown in `Knowledge/`. Here's what happens when I use it.
+The doc agent is a sub-agent in CircuitPilot. It has one job: take PDFs from `WIP/` and produce organized, searchable Markdown in `Knowledge/`. 
+
+### Document Lifecycle
+
+I brought the Document Lifecycle idea into the document management workflow. This avoid LLM accidentally changes the documents we've reviewed and approved. 
+
+```
+WIP/ → (rename + identify) → .wip/ → (convert + cleanup) → .review/ → (approve) → Knowledge/ + Datasheet/
+```
+
+The agent moves files forward through this pipeline automatically. I only intervene at the review step. If I reject something, the agent moves it back to `.wip/` with notes on what to fix.
+
+Here's what happens when I use it.
 
 ### 1. I Drop PDFs Into WIP/
 
@@ -98,6 +110,45 @@ Knowledge/
 ```
 
 One folder per document keeps things isolated. `knowledge.md` gives LLM a quick index — one line per document with product type, number, and a brief description. I can grep the whole knowledge base in one command.
+
+## How Documents Are Organized
+
+The doc agent doesn't just convert PDFs — it builds a structured library that both I and the other agents can navigate without guesswork.
+
+### The Full Directory Tree
+
+Every document passes through four directories, each with a clear purpose:
+
+```
+.data/documents/
+├── WIP/              # I drop raw PDFs here
+├── Datasheet/        # Original PDFs, renamed and sorted
+│   └── IC-TPS62870-DS/
+│       └── IC-TPS62870-DS.pdf
+├── Knowledge/        # Converted Markdown, organized by part
+│   ├── knowledge.md  # One-line index of all documents
+│   └── IC-TPS62870-DS/
+│       ├── IC-TPS62870-DS.md
+│       └── images/
+└── .trash/           # Nothing is ever deleted — just moved here
+```
+
+- **`WIP/`** — Landing zone. I dump any PDF here, no naming convention required. The agent watches this directory and processes files on demand.
+- **`Datasheet/`** — The original PDF, renamed to the standard `<TYPE>-<PN>-<DOCTYPE>.pdf` convention. This is my permanent archive. If the supplier removes the PDF from their site, I still have it.
+- **`Knowledge/`** — The converted Markdown, extracted images, and the master index. This is what agents read. I don't touch files in here directly — the agent manages everything.
+- **`.trash/`** — When I tell the agent to remove a document, it moves the files here instead of deleting them. I can recover anything for 30 days before the agent purges old trash.
+
+### How knowledge.md Works
+
+The index file is maintained automatically. Every time a document moves from `.review/` to `Knowledge/`, the agent appends a line:
+
+```
+IC | TPS62870 | DS | Step-down converter, 2.4V-6V in, 0.8-3.3V out, 3A | 2026-05-10
+```
+
+The format is `TYPE | PN | DOCTYPE | summary | date-processed`. The agent generates the summary from the first paragraph of the datasheet, so every entry is a useful hint about what the part does.
+
+This document is useful for other sub-agents, like `lib` or `designer`, when they are trying to grep quickly about a particular part information or look into what datasheets are available for further study. 
 
 ## What This Enables
 
