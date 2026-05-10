@@ -2,7 +2,7 @@
 title: 'Part 2: The Doc Agent — Turning PDFs into Markdown the AI Can Read'
 description: "Part 2 of the Pi Extensions for Hardware Design series. How I use the doc agent to convert datasheets into structured Markdown so the designer agent can read them."
 slug: 'doc-agent-circuitpilot'
-pubDate: 'May 06 2026'
+pubDate: 'May 10 2026'
 heroImage: '../../assets/blog-placeholder-5.jpg'
 series: 'pi-extensions-for-hardware-design'
 ---
